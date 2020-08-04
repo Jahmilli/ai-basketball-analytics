@@ -92,7 +92,7 @@ const setupFilesMap = async () => {
 
   const dotProductResult = getDotProduct(vector1, vector2); // (8)
   const roots = getVectorRoots(vector1, vector2); // (9, 10)
-  const cosResult = getCosine(dotProductResult, roots);
+  const cosResult = getCosine(dotProductResult, roots); // (11)
   console.table(cosResult);
 
   return "done";
