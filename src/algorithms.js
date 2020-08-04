@@ -69,7 +69,7 @@ const getDotProduct = (vector1, vector2) => {
   const values = [];
   for (const index in vector1) {
     const result =
-      vector1[index].u * vector2[index].u + vector1[index].v * vector2[index].v;
+      vector1[index].u * vector1[index].v + vector2[index].u * vector2[index].v;
     values.push(result);
   }
   return values;
