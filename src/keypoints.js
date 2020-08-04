@@ -1,5 +1,13 @@
 const path = require("path");
 const fs = require("fs");
+const {
+  getMultiAxisAlignment,
+  getSingleAxisAlignment,
+  getVectors,
+  getDotProduct,
+  getVectorRoots,
+  getCosine,
+} = require("./algorithms");
 
 // Based on https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/output.md#keypoint-ordering-in-cpython
 // To use this, multiply the index of a body part by 3 as values in pose_keypoints_2d are as follows [x-coordinate, y-coordinate, confidence.....] for each body part from the mapping
@@ -54,22 +62,39 @@ const setupFilesMap = async () => {
   // Logging all keypoints from all files for "MidHip"
   console.log(`\n\nBody Part: ${bodyPart}`);
   // console.table(getAllKeypointsByBodyPart(filesMap, bodyPart));
+
+  // Left
   const leftShoulderKeypoints = getAllKeypointsByBodyPart(
     filesMap,
     "LShoulder"
   );
+  const leftFootKeypoints = getAllKeypointsByBodyPart(filesMap, "LAnkle");
+  const leftElbowKeypoints = getAllKeypointsByBodyPart(filesMap, "LElbow");
+  const leftHipKeypoints = getAllKeypointsByBodyPart(filesMap, "LHip");
+  const leftKneeKeypoints = getAllKeypointsByBodyPart(filesMap, "LKnee");
+  const leftWristKeypoints = getAllKeypointsByBodyPart(filesMap, "LWrist");
+  // Right
+  const rightFootKeypoints = getAllKeypointsByBodyPart(filesMap, "RAnkle");
   const rightShoulderKeypoints = getAllKeypointsByBodyPart(
     filesMap,
     "RShoulder"
   );
-  const leftFootKeypoints = getAllKeypointsByBodyPart(filesMap, "LAnkle");
-  const rightFootKeypoints = getAllKeypointsByBodyPart(filesMap, "RAnkle");
-  getKeypointsDistanceDifference(leftShoulderKeypoints, rightShoulderKeypoints);
-  getKeypointsDistanceDifference(leftFootKeypoints, rightFootKeypoints);
-  // console.table(leftShoulderKeypoints);
-  // console.table(rightShoulderKeypoints);
-  // console.table(leftFootKeypoints);
-  // console.table(rightFootKeypoints);
+
+  getMultiAxisAlignment(leftShoulderKeypoints, rightShoulderKeypoints); // (1)
+  getMultiAxisAlignment(leftFootKeypoints, rightFootKeypoints); // (2)
+
+  getSingleAxisAlignment(leftElbowKeypoints, leftHipKeypoints); // (3)
+  getSingleAxisAlignment(leftShoulderKeypoints, leftHipKeypoints); // (4)
+  getSingleAxisAlignment(leftKneeKeypoints, leftHipKeypoints); // (5)
+
+  const vector1 = getVectors(leftWristKeypoints, leftElbowKeypoints); // (6)
+  const vector2 = getVectors(leftShoulderKeypoints, leftElbowKeypoints); // (7)
+
+  const dotProductResult = getDotProduct(vector1, vector2); // (8)
+  const roots = getVectorRoots(vector1, vector2); // (9, 10)
+  const cosResult = getCosine(dotProductResult, roots);
+  console.table(cosResult);
+
   return "done";
 };
 
@@ -83,25 +108,6 @@ const getAllKeypointsByBodyPart = (filesMap, bodyPart) => {
     };
     // return fileValues.people[0].pose_keypoints_2d.slice(index, index + 3);
   });
-};
-
-const getKeypointsDistanceDifference = (leftKeypoints, rightKeypoints) => {
-  if (leftKeypoints.length !== rightKeypoints.length) {
-    console.warn(
-      `Left keypoints (${leftKeypoints.length}) is different to right keypoints (${rightKeypoints.length})`
-    );
-    throw new Error("Varied lengths");
-  }
-  const values = [];
-
-  for (const index in leftKeypoints) {
-    const xVal = leftKeypoints[index].x - rightKeypoints[index].x;
-    const yVal = leftKeypoints[index].y - rightKeypoints[index].y;
-    const result = Math.sqrt(Math.pow(xVal, 2) + Math.pow(yVal, 2));
-    values.push(result);
-  }
-  console.table(values);
-  return values;
 };
 
 setupFilesMap()
