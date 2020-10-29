@@ -33,7 +33,7 @@ describe("End-2-End test", () => {
       .send({
         // TODO: Input Data goes here
       })
-      .expect(201, {
+      .expect(200, {
         fullName: "Prof. Proton",
         timestamp: 1540332453982,
       });

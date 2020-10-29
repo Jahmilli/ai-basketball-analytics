@@ -18,7 +18,7 @@ export class V1Router implements IRouter {
   setupRoutes(): Router {
     return Router().post(
       "/convert",
-      validationMiddleware(InSchema, "body"),
+      // validationMiddleware(InSchema, "body"),
       async (req: Request, res: Response) => {
         this.logger.debug(`Received request with body ${inspect(req.body)}`);
 

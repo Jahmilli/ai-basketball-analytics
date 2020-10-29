@@ -10,7 +10,7 @@ export class AnalyticsService {
     console.log("inObj is ", inObj);
     const convertedName = {
       fullName: `Prof. ${inObj.name}`,
-      timestamp: inObj.timestamp,
+      timestamp: Date.now(),
     };
     this.logger.debug(`Converted name is ${inspect(convertedName)}`);
     return convertedName;

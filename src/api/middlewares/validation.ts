@@ -1,7 +1,6 @@
 import { ObjectSchema } from "@hapi/joi";
 import { NextFunction, Request, Response } from "express";
 import { getLogger } from "../../utils/Logging";
-import * as Metrics from "../../utils/Metrics";
 
 const logger = getLogger();
 
@@ -13,7 +12,6 @@ export const validationMiddleware = (
   const { error } = result;
 
   if (!!error) {
-    Metrics.missingMandatoryFieldTotal.inc();
     // Need 2 logs here so we don't log any PII from request
     logger.warn("Invalid request was made");
     logger.debug(
