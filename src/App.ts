@@ -1,27 +1,21 @@
-import { getLogger } from "./utils/Logging";
 import config from "config";
-import { ExpressWrapper } from "./components/ExpressWrapper";
-import { KafkaProducer } from "./components/KafkaProducer";
 import { V1Router } from "./api/routes/v1";
-import { NameConverterService } from "./services/NameConverterService";
+import { ExpressWrapper } from "./components/ExpressWrapper";
+import { AnalyticsService } from "./services/AnalyticsService";
+import { getLogger } from "./utils/Logging";
 
 export class App {
   private logger = getLogger();
   private expressWrapper = new ExpressWrapper();
-  private kafkaProducer = new KafkaProducer();
+  private analyticsService = new AnalyticsService();
 
-  /**
-   * Only add static code to constructor to make unit testing possible.
-   */
   constructor() {
-    const routines = new NameConverterService(this.kafkaProducer);
-    const v1Router = new V1Router(routines);
+    const v1Router = new V1Router(this.analyticsService);
     this.expressWrapper.addRouter(v1Router);
   }
 
   async start(): Promise<void> {
     this.logger.info("Starting App");
-    await this.kafkaProducer.start();
     await this.expressWrapper.start(config.get("api.port"));
     this.logger.info("Started App");
   }
@@ -29,7 +23,6 @@ export class App {
   async stop(): Promise<void> {
     this.logger.info("Stopping App");
     await this.expressWrapper.stop();
-    await this.kafkaProducer.stop();
     this.logger.info("Stopped App");
   }
 }
