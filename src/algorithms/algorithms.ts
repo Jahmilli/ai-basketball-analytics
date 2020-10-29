@@ -1,5 +1,18 @@
-/ Based on algorithm from "Alignment Between Feet & Shoulder"
-const getMultiAxisAlignment = (leftKeypoints, rightKeypoints) => {
+interface IKeypoint {
+  x: number;
+  y: number;
+}
+interface IVector {
+  u: number;
+  v: number;
+}
+interface IResults {
+  ELWLResults: number[],
+  ElSLResults: number[],
+}
+
+// Based on algorithm from "Alignment Between Feet & Shoulder"
+export const getMultiAxisAlignment = (leftKeypoints: IKeypoint[], rightKeypoints: IKeypoint[]) => {
   if (leftKeypoints.length !== rightKeypoints.length) {
     console.warn(
       `Left keypoints (${leftKeypoints.length}) is different to right keypoints (${rightKeypoints.length})`
@@ -17,7 +30,7 @@ const getMultiAxisAlignment = (leftKeypoints, rightKeypoints) => {
   return values;
 };
 
-const getSingleAxisAlignment = (leftKeypoints, rightKeypoints) => {
+export const getSingleAxisAlignment = (leftKeypoints: IKeypoint[], rightKeypoints: IKeypoint[]) => {
   if (leftKeypoints.length !== rightKeypoints.length) {
     console.warn(
       `Left keypoints (${leftKeypoints.length}) is different to right keypoints (${rightKeypoints.length})`
@@ -38,7 +51,7 @@ const getSingleAxisAlignment = (leftKeypoints, rightKeypoints) => {
   return values;
 };
 
-const getVectors = (leftKeypoints, rightKeypoints) => {
+export const getVectors = (leftKeypoints: IKeypoint[], rightKeypoints: IKeypoint[]): IVector[] => {
   if (leftKeypoints.length !== rightKeypoints.length) {
     console.warn(
       `Left keypoints (${leftKeypoints.length}) is different to right keypoints (${rightKeypoints.length})`
@@ -56,11 +69,10 @@ const getVectors = (leftKeypoints, rightKeypoints) => {
   return values;
 };
 
-const getDotProduct = (vector1, vector2) => {
+export const getDotProduct = (vector1: IVector[], vector2: IVector[]): number[] => {
   if (Object.keys(vector1).length !== Object.keys(vector2).length) {
     console.warn(
-      `Vector 1 keypoints (${
-        Object.keys(vector1).length
+      `Vector 1 keypoints (${Object.keys(vector1).length
       }) is different to Vector 2 keypoints (${Object.keys(vector2).length})`
     );
     throw new Error("Varied lengths");
@@ -75,11 +87,10 @@ const getDotProduct = (vector1, vector2) => {
   return values;
 };
 
-const getVectorRoots = (vector1, vector2) => {
+export const getVectorRoots = (vector1: IVector[], vector2: IVector[]): IResults => {
   if (Object.keys(vector1).length !== Object.keys(vector2).length) {
     console.warn(
-      `Vector 1 keypoints (${
-        Object.keys(vector1).length
+      `Vector 1 keypoints (${Object.keys(vector1).length
       }) is different to Vector 2 keypoints (${Object.keys(vector2).length})`
     );
     throw new Error("Varied lengths");
@@ -104,10 +115,10 @@ const getVectorRoots = (vector1, vector2) => {
   };
 };
 
-const getCosine = (dotProductResultsArr, vectorRootsArr) => {
+export const getCosine = (dotProductResultsArr: number[], vectorRootsArr: IResults) => {
   if (dotProductResultsArr.length !== vectorRootsArr.ELWLResults.length) {
     console.warn(
-      `Dot Product Results Arr (${dotProductResultsArr.length}) is different to vectorRootsArr (${vectorRootsArr.length})`
+      `Dot Product Results Arr (${dotProductResultsArr.length}) is different to vectorRootsArr (${vectorRootsArr.ELWLResults.length})`
     );
     throw new Error("Varied lengths");
   }
@@ -115,17 +126,17 @@ const getCosine = (dotProductResultsArr, vectorRootsArr) => {
   for (const index in dotProductResultsArr) {
     results.push(
       dotProductResultsArr[index] /
-        (vectorRootsArr.ELWLResults[index] * vectorRootsArr.ElSLResults[index])
+      (vectorRootsArr.ELWLResults[index] * vectorRootsArr.ElSLResults[index])
     );
   }
   return results;
 };
 
-module.exports = {
-  getMultiAxisAlignment,
-  getSingleAxisAlignment,
-  getVectors,
-  getDotProduct,
-  getVectorRoots,
-  getCosine,
-};
+// module.exports = {
+//   getMultiAxisAlignment,
+//   getSingleAxisAlignment,
+//   getVectors,
+//   getDotProduct,
+//   getVectorRoots,
+//   getCosine,
+// };

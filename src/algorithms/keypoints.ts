@@ -1,13 +1,14 @@
-const path = require("path");
-const fs = require("fs");
-const {
+import path from "path";
+import fs from "fs";
+import { formatError } from "../utils/Logging";
+import {
   getMultiAxisAlignment,
   getSingleAxisAlignment,
   getVectors,
   getDotProduct,
   getVectorRoots,
   getCosine,
-} = require("./algorithms");
+} from "./algorithms";
 
 // Based on https://github.com/CMU-Perceptual-Computing-Lab/openpose/blob/master/doc/output.md#keypoint-ordering-in-cpython
 // To use this, multiply the index of a body part by 3 as values in pose_keypoints_2d are as follows [x-coordinate, y-coordinate, confidence.....] for each body part from the mapping
@@ -46,9 +47,13 @@ const bodyPart = "LWrist"; // Body part to analyse
 // Loops through all files, reads the JSON in and saves it into a map
 const setupFilesMap = async () => {
   const allFiles = [];
-  const filesMap = {};
-  await new Promise((resolve) => {
+  const filesMap: { [key: string]: any } = {};
+  await new Promise((resolve, reject) => {
     fs.readdir(keypointDirName, (err, files) => {
+      if (err) {
+        console.warn(`An error occurred when reading directory ${formatError(err)}`);
+        return reject(err);
+      }
       files.forEach((file) => {
         allFiles.push(file);
         const filename = file.substr(0, file.indexOf("."));
@@ -56,7 +61,7 @@ const setupFilesMap = async () => {
           fs.readFileSync(path.join(keypointDirName, file), "utf-8")
         );
       });
-      resolve();
+      resolve(true);
     });
   });
   // Logging all keypoints from all files for "MidHip"
@@ -98,7 +103,7 @@ const setupFilesMap = async () => {
   return "done";
 };
 
-const getAllKeypointsByBodyPart = (filesMap, bodyPart) => {
+const getAllKeypointsByBodyPart = (filesMap: {[key: string]: any}, bodyPart: string) => {
   const index = bodyMapping.indexOf(bodyPart) * 3;
   return Object.values(filesMap).map((fileValues, i) => {
     return {
