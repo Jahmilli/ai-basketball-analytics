@@ -13,7 +13,7 @@
     "start": "node dist/index.js",
     "clearCache": "jest --clearCache",
     "start:dev": "NODE_ENV=dev ts-node src/index.ts",
-    "start:devws": "set NODE_ENV=dev&& ts-node src/index.ts",
+    "start:devws": "set NODE_ENV=dev&& set LOG_LEVEL=debug&& ts-node src/index.ts",
     "package": "tar czf ${npm_package_name}.tar.gz Dockerfile config dist node_modules proto"
   },
   "private": true,
