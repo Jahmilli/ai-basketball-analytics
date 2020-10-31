@@ -7,12 +7,178 @@ interface IVector {
   v: number;
 }
 interface IResults {
-  ELWLResults: number[],
-  ElSLResults: number[],
+  ELWLResults: number[];
+  ElSLResults: number[];
 }
 
+// Bens stuff
+const multiAxisThreshold = 20;
+const singleAxisThreshold = 25;
+const cosineThreshold = -0.9659258262890682867497431997289;
+
+//Find index of Max hip value
+const getEIndex = (keypoints: any) => {
+  let eIndex = -1;
+  for (let x = 0; x < keypoints.midHipKeypoints.length; x++) {
+    if (keypoints.midHipKeypoints[x] > eIndex)
+      eIndex = keypoints.midHipKeypoints[x];
+  }
+  console.log(eIndex);
+  return eIndex;
+};
+
+//Find index of Min wrist value
+const getFIndex = (keypoints: any) => {
+  let fIndex = -1;
+  for (let x = 0; x < keypoints.rightWristKeypoints.length; x++) {
+    if (keypoints.rightWirstKeypoints[x] > fIndex)
+      fIndex = keypoints.rightWirstKeypoints[x];
+  }
+  console.log(fIndex);
+  return fIndex;
+};
+
+//Returns the differences between DSLSR & DFLFR
+//Difference Shoulder left Shoulder right & Difference Foot left Foot Right
+const getAllDifferences = (
+  eIndex: number,
+  shoulderResult: any,
+  footResult: any
+) => {
+  const values = [];
+  const isGreaterThan0 = eIndex - 10;
+  for (let x = isGreaterThan0 ? eIndex - 10 : 0; x < eIndex; x++) {
+    values.push(
+      Math.sqrt(Math.pow(shoulderResult[x], 2)) -
+        Math.sqrt(Math.pow(footResult[x], 2))
+    );
+  }
+
+  //const index = bodyMapping.indexOf(bodyPart) * 3;
+  return Object.values(values).map((values, i) => {
+    return {
+      values: values,
+    };
+    // return fileValues.people[0].pose_keypoints_2d.slice(index, index + 3);
+  });
+};
+
+//Returns the total difference in right side axis alignment
+//DEH + DSH + DKH = minimum distance to axis D
+//Distance Elbow Hip + Distance Shoulder Hip + Distance Knee Hip
+// const getAllDifferencesSingle = (
+//   elbowHipResult: any,
+//   shoulderHipResult: any,
+//   kneeHipResult: any
+// ) => {
+//   const values = [];
+//   for (let x = eIndex; x < fIndex; x++) {
+//     values.push(elbowHipResult[x] + shoulderHipResult[x] + kneeHipResult[x]);
+//   }
+
+//   //const index = bodyMapping.indexOf(bodyPart) * 3;
+//   return Object.values(values).map((values, i) => {
+//     return {
+//       values: values,
+//     };
+//     // return fileValues.people[0].pose_keypoints_2d.slice(index, index + 3);
+//   });
+// };
+
+//Returns the total difference in right side axis alignment
+//DEH + DKH = minimum distance to axis D
+//Distance Elbow Hip +  Distance Knee Hip
+const getAllDifferencesSingleAlt = (
+  eIndex: number,
+  fIndex: number,
+  elbowHipResult: any,
+  kneeHipResult: any
+) => {
+  const values = [];
+  for (let x = eIndex; x < fIndex; x++) {
+    values.push(elbowHipResult[x] + kneeHipResult[x]);
+  }
+
+  //const index = bodyMapping.indexOf(bodyPart) * 3;
+  return Object.values(values).map((values, i) => {
+    return {
+      values: values,
+    };
+    // return fileValues.people[0].pose_keypoints_2d.slice(index, index + 3);
+  });
+};
+
+/*
+    leftShoulderKeypoints,
+    leftFootKeypoints,
+    leftElbowKeypoints,
+    leftHipKeypoints,
+    leftKneeKeypoints,
+    leftWristKeypoints,
+    rightShoulderKeypoints,
+    rightFootKeypoints,
+    rightElbowKeypoints,
+    rightHipKeypoints,
+    rightKneeKeypoints,
+    rightWristKeypoints
+*/
+// old stuff
+export const callStuff = (keypoints: any) => {
+  let eIndex = getEIndex(keypoints.midHipKeypoints);
+  let fIndex = getFIndex(keypoints.rightWristKeypoints);
+
+  const shoulderResult = getMultiAxisAlignment(
+    keypoints.leftShoulderKeypoints,
+    keypoints.rightShoulderKeypoints
+  ); // (1)
+  const footResult = getMultiAxisAlignment(
+    keypoints.leftFootKeypoints,
+    keypoints.rightFootKeypoints
+  ); // (2)
+  const multiAxisResult = getAllDifferences(eIndex, shoulderResult, footResult);
+  console.log("multiaxis result", multiAxisResult);
+
+  const valuesElbowHip = getSingleAxisAlignment(
+    keypoints.rightElbowKeypoints,
+    keypoints.rightHipKeypoints
+  ); // (3)
+  const valuesKneeHip = getSingleAxisAlignment(
+    keypoints.rightKneeKeypoints,
+    keypoints.rightHipKeypoints
+  ); // (4)
+  //Only used for extra alignment analysis but no necessary
+  //const valuesShoulderHip = getSingleAxisAlignment(keypoints.rightShoulderKeypoints, keypoints.rightHipKeypoints); // (5)
+  //const valuesFootHip = getSingleAxisAlignment(keypoints.rightFootKeypoints, keypoints.rightHipKeypoints); // (5)
+  const singleAxisResult = getAllDifferencesSingleAlt(
+    eIndex,
+    fIndex,
+    valuesElbowHip,
+    valuesKneeHip
+  );
+  console.log("singleAxis result", singleAxisResult);
+
+  const vector1 = getVectors(
+    fIndex,
+    keypoints.rightWristKeypoints,
+    keypoints.rightElbowKeypoints
+  ); // (6)
+  const vector2 = getVectors(
+    fIndex,
+    keypoints.rightShoulderKeypoints,
+    keypoints.rightElbowKeypoints
+  ); // (7)
+
+  const dotProductResult = getDotProduct(vector1, vector2); // (8)
+  const roots = getVectorRoots(vector1, vector2); // (9, 10)
+  const cosResult = getCosine(dotProductResult, roots); // (11)
+  console.table(cosResult);
+};
+
 // Based on algorithm from "Alignment Between Feet & Shoulder"
-export const getMultiAxisAlignment = (leftKeypoints: IKeypoint[], rightKeypoints: IKeypoint[]) => {
+export const getMultiAxisAlignment = (
+  leftKeypoints: IKeypoint[],
+  rightKeypoints: IKeypoint[]
+) => {
   if (leftKeypoints.length !== rightKeypoints.length) {
     console.warn(
       `Left keypoints (${leftKeypoints.length}) is different to right keypoints (${rightKeypoints.length})`
@@ -30,7 +196,10 @@ export const getMultiAxisAlignment = (leftKeypoints: IKeypoint[], rightKeypoints
   return values;
 };
 
-export const getSingleAxisAlignment = (leftKeypoints: IKeypoint[], rightKeypoints: IKeypoint[]) => {
+export const getSingleAxisAlignment = (
+  leftKeypoints: IKeypoint[],
+  rightKeypoints: IKeypoint[]
+) => {
   if (leftKeypoints.length !== rightKeypoints.length) {
     console.warn(
       `Left keypoints (${leftKeypoints.length}) is different to right keypoints (${rightKeypoints.length})`
@@ -51,7 +220,11 @@ export const getSingleAxisAlignment = (leftKeypoints: IKeypoint[], rightKeypoint
   return values;
 };
 
-export const getVectors = (leftKeypoints: IKeypoint[], rightKeypoints: IKeypoint[]): IVector[] => {
+export const getVectors = (
+  fIndex: number,
+  leftKeypoints: IKeypoint[],
+  rightKeypoints: IKeypoint[]
+): IVector[] => {
   if (leftKeypoints.length !== rightKeypoints.length) {
     console.warn(
       `Left keypoints (${leftKeypoints.length}) is different to right keypoints (${rightKeypoints.length})`
@@ -60,19 +233,29 @@ export const getVectors = (leftKeypoints: IKeypoint[], rightKeypoints: IKeypoint
   }
 
   const values = [];
-  for (const index in leftKeypoints) {
-    const u = leftKeypoints[index].y - rightKeypoints[index].y;
-    const v = leftKeypoints[index].x - rightKeypoints[index].x; // This should be Z axis...
+  const isGreaterThanMax = fIndex + 30 - leftKeypoints.length;
+
+  for (
+    let i = fIndex;
+    i < isGreaterThanMax ? leftKeypoints.length : fIndex + 20;
+    i++
+  ) {
+    const u = leftKeypoints[i].y - rightKeypoints[i].y;
+    const v = leftKeypoints[i].x - rightKeypoints[i].x; // This should be Z axis...
     values.push({ u, v });
   }
   // console.table(values);
   return values;
 };
 
-export const getDotProduct = (vector1: IVector[], vector2: IVector[]): number[] => {
+export const getDotProduct = (
+  vector1: IVector[],
+  vector2: IVector[]
+): number[] => {
   if (Object.keys(vector1).length !== Object.keys(vector2).length) {
     console.warn(
-      `Vector 1 keypoints (${Object.keys(vector1).length
+      `Vector 1 keypoints (${
+        Object.keys(vector1).length
       }) is different to Vector 2 keypoints (${Object.keys(vector2).length})`
     );
     throw new Error("Varied lengths");
@@ -87,10 +270,14 @@ export const getDotProduct = (vector1: IVector[], vector2: IVector[]): number[] 
   return values;
 };
 
-export const getVectorRoots = (vector1: IVector[], vector2: IVector[]): IResults => {
+export const getVectorRoots = (
+  vector1: IVector[],
+  vector2: IVector[]
+): IResults => {
   if (Object.keys(vector1).length !== Object.keys(vector2).length) {
     console.warn(
-      `Vector 1 keypoints (${Object.keys(vector1).length
+      `Vector 1 keypoints (${
+        Object.keys(vector1).length
       }) is different to Vector 2 keypoints (${Object.keys(vector2).length})`
     );
     throw new Error("Varied lengths");
@@ -115,7 +302,10 @@ export const getVectorRoots = (vector1: IVector[], vector2: IVector[]): IResults
   };
 };
 
-export const getCosine = (dotProductResultsArr: number[], vectorRootsArr: IResults) => {
+export const getCosine = (
+  dotProductResultsArr: number[],
+  vectorRootsArr: IResults
+) => {
   if (dotProductResultsArr.length !== vectorRootsArr.ELWLResults.length) {
     console.warn(
       `Dot Product Results Arr (${dotProductResultsArr.length}) is different to vectorRootsArr (${vectorRootsArr.ELWLResults.length})`
@@ -126,17 +316,8 @@ export const getCosine = (dotProductResultsArr: number[], vectorRootsArr: IResul
   for (const index in dotProductResultsArr) {
     results.push(
       dotProductResultsArr[index] /
-      (vectorRootsArr.ELWLResults[index] * vectorRootsArr.ElSLResults[index])
+        (vectorRootsArr.ELWLResults[index] * vectorRootsArr.ElSLResults[index])
     );
   }
   return results;
 };
-
-// module.exports = {
-//   getMultiAxisAlignment,
-//   getSingleAxisAlignment,
-//   getVectors,
-//   getDotProduct,
-//   getVectorRoots,
-//   getCosine,
-// };

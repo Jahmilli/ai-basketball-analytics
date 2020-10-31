@@ -13,6 +13,7 @@
     "start": "node dist/index.js",
     "clearCache": "jest --clearCache",
     "start:dev": "NODE_ENV=dev ts-node src/index.ts",
+    "start:devws": "set NODE_ENV=dev&& ts-node src/index.ts",
     "package": "tar czf ${npm_package_name}.tar.gz Dockerfile config dist node_modules proto"
   },
   "private": true,
@@ -21,6 +22,9 @@
     "config": "^3.3.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "pg": "^8.3.0",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.25",
     "winston": "^3.3.3"
   },
   "devDependencies": {

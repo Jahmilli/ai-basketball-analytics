@@ -1,5 +1,5 @@
 module.exports = {
   api: {
-    port: 3001,
+    port: 3003,
   },
 };

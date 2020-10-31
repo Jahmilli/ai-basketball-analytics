@@ -51,7 +51,9 @@ const setupFilesMap = async () => {
   await new Promise((resolve, reject) => {
     fs.readdir(keypointDirName, (err, files) => {
       if (err) {
-        console.warn(`An error occurred when reading directory ${formatError(err)}`);
+        console.warn(
+          `An error occurred when reading directory ${formatError(err)}`
+        );
         return reject(err);
       }
       files.forEach((file) => {
@@ -84,6 +86,8 @@ const setupFilesMap = async () => {
     filesMap,
     "RShoulder"
   );
+  //Hip
+  const midHipKeypoints = getAllKeypointsByBodyPart(filesMap, "MidHip");
 
   getMultiAxisAlignment(leftShoulderKeypoints, rightShoulderKeypoints); // (1)
   getMultiAxisAlignment(leftFootKeypoints, rightFootKeypoints); // (2)
@@ -103,7 +107,10 @@ const setupFilesMap = async () => {
   return "done";
 };
 
-const getAllKeypointsByBodyPart = (filesMap: {[key: string]: any}, bodyPart: string) => {
+const getAllKeypointsByBodyPart = (
+  filesMap: { [key: string]: any },
+  bodyPart: string
+) => {
   const index = bodyMapping.indexOf(bodyPart) * 3;
   return Object.values(filesMap).map((fileValues, i) => {
     return {
