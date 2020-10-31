@@ -316,9 +316,9 @@ export const getCosine = (
   }
   const results = [];
   for (const index in dotProductResultsArr) {
-    results.push(
+    results.push(Math.acos(
       dotProductResultsArr[index] /
-        (vectorRootsArr.ELWLResults[index] * vectorRootsArr.ElSLResults[index])
+        (vectorRootsArr.ELWLResults[index] * vectorRootsArr.ElSLResults[index]))*180/Math.PI
     );
   }
   return results;
