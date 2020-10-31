@@ -11,6 +11,7 @@
     "baseUrl": ".",
     "traceResolution": false,
     "noUnusedLocals": false,
+    "experimentalDecorators": true,
     "paths": {
       "*": ["node_modules/*", "src/types/*"]
     }

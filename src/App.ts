@@ -8,8 +8,8 @@ import Database from "./components/Database";
 export class App {
   private logger = getLogger();
   private expressWrapper = new ExpressWrapper();
-  private analyticsService = new AnalyticsService();
   private db = new Database("video-connection");
+  private analyticsService = new AnalyticsService(this.db);
 
   constructor() {
     const v1Router = new V1Router(this.analyticsService);
