@@ -12,9 +12,12 @@ interface IResults {
 }
 
 // Bens stuff
+/* Multi axis threshold is the set threshold for the alignment of feet and shoulders. A value greater than this
+** means feet and shoulder alignment is too far apart and needs to be corrected -- closer to 0 the better.
+*/
 const multiAxisThreshold = 20;
 const singleAxisThreshold = 25;
-const cosineThreshold = -0.9659258262890682867497431997289;
+const cosineThreshold = 165;
 
 //Find index of Max hip value
 const getEIndex = (midHipKeypoints: any) => {
@@ -63,7 +66,45 @@ const getAllDifferences = (
   });
 };
 
-//Returns the total difference in right side axis alignment
+const getStringMultiAxis = (multiAxisResult: any) => {
+  let avgMultiAxis = 0;
+  // console.log('rightWristKeypoints', rightWristKeypoints);
+  for (const index in multiAxisResult) {
+    avgMultiAxis += multiAxisResult[index].values;
+  }
+  avgMultiAxis = avgMultiAxis/multiAxisResult.length;
+  console.log('Average alignment distance between feet and shoulders is: ',avgMultiAxis);
+  return avgMultiAxis < multiAxisThreshold ? 'Good feet and shoulder alignment and distancing' : 
+  'Shoulder and feet alignment was too far apart. Bring feet in to a little less than shoulder width';
+};
+
+const getStringSingleAxis = (singleAxisResult: any) => {
+  let avgSingleAxis = 0;
+  // console.log('rightWristKeypoints', rightWristKeypoints);
+  for (const index in singleAxisResult) {
+    avgSingleAxis += singleAxisResult[index].values;
+  }
+  avgSingleAxis = avgSingleAxis/singleAxisResult.length;
+  console.log('Average axis alignment of shooting elbow, hip and knee is: ',avgSingleAxis);
+  return avgSingleAxis < singleAxisThreshold ? 'Good alignment down the shooting arm between elbow, hip and knee' : 
+  'Shooting side alignment was too spread. Bring the elbow and knee in line, facing toward the basket';
+};
+
+const getStringCosine = (cosineResult: any) => {
+  let avgAngle = 0;
+  // console.log('rightWristKeypoints', rightWristKeypoints);
+  for (const index in cosineResult) {
+    avgAngle += cosineResult[index];
+  }
+  avgAngle = avgAngle/cosineResult.length;
+  console.log('Average Angle at elbow is: ',avgAngle);
+  return avgAngle > cosineThreshold ? 'Good extension that was held up for a good duration' : 
+  'Shooting arm was not fully extended and/or was not held toward basket for long enough. Fully extend arm towards the basket on follow through and hold it until ball reaches the basket';
+};
+
+/*Returns the total difference in right side axis alignment. An alternate calculation incorporating more
+* key points on the shooting side of the body.
+*/
 //DEH + DSH + DKH = minimum distance to axis D
 //Distance Elbow Hip + Distance Shoulder Hip + Distance Knee Hip
 // const getAllDifferencesSingle = (
@@ -172,6 +213,14 @@ export const callStuff = (keypoints: any) => {
   const roots = getVectorRoots(vector1, vector2); // (9, 10)
   const cosResult = getCosine(dotProductResult, roots); // (11)
   console.table(cosResult);
+  // console.log('multi axis string', getStringMultiAxis(multiAxisResult));
+  // console.log('single axis string', getStringSingleAxis(singleAxisResult));
+  // console.log('cosine string', getStringCosine(cosResult));
+  return {
+    multiAxis: getStringMultiAxis(multiAxisResult),
+    singleAxis: getStringSingleAxis(singleAxisResult),
+    angle: getStringCosine(cosResult)
+  };
 };
 
 // Based on algorithm from "Alignment Between Feet & Shoulder"

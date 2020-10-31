@@ -22,6 +22,6 @@ export class AnalyticsService {
 
   async analyseKeypoints(inObj: IConvertBody) {
     const feedback = callStuff(inObj.keypoints) as any;
-    await this.database.updateVideoResult(inObj.id, 'Sexy shot');
+    await this.database.updateVideoResult(inObj.id, feedback.multiAxis);
   }
 }
