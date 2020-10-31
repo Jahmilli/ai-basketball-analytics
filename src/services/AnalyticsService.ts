@@ -11,7 +11,7 @@ export class AnalyticsService {
 
   async convert(inObj: IConvertBody): Promise<any> {
     console.log("inObj is ", inObj);
-    this.analyseKeypoints(inObj.keypoints);
+    this.analyseKeypoints(inObj);
     const convertedName = {
       fullName: `Prof. Seb`,
       timestamp: Date.now(),
