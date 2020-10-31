@@ -17,24 +17,27 @@ const singleAxisThreshold = 25;
 const cosineThreshold = -0.9659258262890682867497431997289;
 
 //Find index of Max hip value
-const getEIndex = (keypoints: any) => {
-  let eIndex = -1;
-  for (let x = 0; x < keypoints.midHipKeypoints.length; x++) {
-    if (keypoints.midHipKeypoints[x] > eIndex)
-      eIndex = keypoints.midHipKeypoints[x];
+const getEIndex = (midHipKeypoints: any) => {
+  let eIndex = 0;
+  // console.log('midHipKeypoints', midHipKeypoints);
+  for (let x = 0; x < midHipKeypoints.length; x++) {
+    //console.log('mid hip' + x + ' ', midHipKeypoints[x].y);
+    if (midHipKeypoints[x].y > midHipKeypoints[eIndex].y)
+      eIndex = x;
   }
-  console.log(eIndex);
+  console.log('e index is', eIndex);
   return eIndex;
 };
 
 //Find index of Min wrist value
-const getFIndex = (keypoints: any) => {
-  let fIndex = -1;
-  for (let x = 0; x < keypoints.rightWristKeypoints.length; x++) {
-    if (keypoints.rightWirstKeypoints[x] > fIndex)
-      fIndex = keypoints.rightWirstKeypoints[x];
+const getFIndex = (rightWristKeypoints: any, eIndex: number) => {
+  let fIndex = eIndex;
+  // console.log('rightWristKeypoints', rightWristKeypoints);
+  for (let x = eIndex; x < rightWristKeypoints.length; x++) {
+    if (rightWristKeypoints[x].y < rightWristKeypoints[fIndex].y)
+      fIndex = x;
   }
-  console.log(fIndex);
+  console.log('f index is', fIndex);
   return fIndex;
 };
 
@@ -48,10 +51,7 @@ const getAllDifferences = (
   const values = [];
   const isGreaterThan0 = eIndex - 10;
   for (let x = isGreaterThan0 ? eIndex - 10 : 0; x < eIndex; x++) {
-    values.push(
-      Math.sqrt(Math.pow(shoulderResult[x], 2)) -
-        Math.sqrt(Math.pow(footResult[x], 2))
-    );
+    values.push(Math.abs(shoulderResult[x] - footResult[x]));
   }
 
   //const index = bodyMapping.indexOf(bodyPart) * 3;
@@ -125,7 +125,7 @@ const getAllDifferencesSingleAlt = (
 // old stuff
 export const callStuff = (keypoints: any) => {
   let eIndex = getEIndex(keypoints.midHipKeypoints);
-  let fIndex = getFIndex(keypoints.rightWristKeypoints);
+  let fIndex = getFIndex(keypoints.rightWristKeypoints, eIndex);
 
   const shoulderResult = getMultiAxisAlignment(
     keypoints.leftShoulderKeypoints,
@@ -233,11 +233,13 @@ export const getVectors = (
   }
 
   const values = [];
-  const isGreaterThanMax = fIndex + 30 - leftKeypoints.length;
-
+  const isGreaterThanMax = fIndex + 20 < leftKeypoints.length - 1;
+  const loopTo = isGreaterThanMax ? fIndex + 20 : leftKeypoints.length-1;
+  // console.log('isGreaterThanMax is', isGreaterThanMax);
+  // console.log('loopToo', loopTo);
   for (
     let i = fIndex;
-    i < isGreaterThanMax ? leftKeypoints.length : fIndex + 20;
+    i < loopTo;
     i++
   ) {
     const u = leftKeypoints[i].y - rightKeypoints[i].y;
@@ -264,7 +266,7 @@ export const getDotProduct = (
   const values = [];
   for (const index in vector1) {
     const result =
-      vector1[index].u * vector1[index].v + vector2[index].u * vector2[index].v;
+      vector1[index].u * vector2[index].u + vector1[index].v * vector2[index].v;
     values.push(result);
   }
   return values;
