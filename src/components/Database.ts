@@ -40,6 +40,7 @@ export default class Database {
       throw new Error("Video not found in database");
     }
     video.feedback = feedback;
+    video.is_processed = true;
     await connectionManager.save(video);
     this.logger.info(`Video has been updated. Video is ${util.inspect(video)}`);
     return video;
