@@ -11,10 +11,16 @@ interface IResults {
   ElSLResults: number[];
 }
 
+export interface IFeedback {
+  multiAxis: string;
+  singleAxis: string;
+  angle: string;
+}
+
 // Bens stuff
 /* Multi axis threshold is the set threshold for the alignment of feet and shoulders. A value greater than this
-** means feet and shoulder alignment is too far apart and needs to be corrected -- closer to 0 the better.
-*/
+ ** means feet and shoulder alignment is too far apart and needs to be corrected -- closer to 0 the better.
+ */
 const multiAxisThreshold = 20;
 const singleAxisThreshold = 25;
 const cosineThreshold = 165;
@@ -25,10 +31,9 @@ const getEIndex = (midHipKeypoints: any) => {
   // console.log('midHipKeypoints', midHipKeypoints);
   for (let x = 0; x < midHipKeypoints.length; x++) {
     //console.log('mid hip' + x + ' ', midHipKeypoints[x].y);
-    if (midHipKeypoints[x].y > midHipKeypoints[eIndex].y)
-      eIndex = x;
+    if (midHipKeypoints[x].y > midHipKeypoints[eIndex].y) eIndex = x;
   }
-  console.log('e index is', eIndex);
+  console.log("e index is", eIndex);
   return eIndex;
 };
 
@@ -37,10 +42,9 @@ const getFIndex = (rightWristKeypoints: any, eIndex: number) => {
   let fIndex = eIndex;
   // console.log('rightWristKeypoints', rightWristKeypoints);
   for (let x = eIndex; x < rightWristKeypoints.length; x++) {
-    if (rightWristKeypoints[x].y < rightWristKeypoints[fIndex].y)
-      fIndex = x;
+    if (rightWristKeypoints[x].y < rightWristKeypoints[fIndex].y) fIndex = x;
   }
-  console.log('f index is', fIndex);
+  console.log("f index is", fIndex);
   return fIndex;
 };
 
@@ -72,10 +76,14 @@ const getStringMultiAxis = (multiAxisResult: any) => {
   for (const index in multiAxisResult) {
     avgMultiAxis += multiAxisResult[index].values;
   }
-  avgMultiAxis = avgMultiAxis/multiAxisResult.length;
-  console.log('Average alignment distance between feet and shoulders is: ',avgMultiAxis);
-  return avgMultiAxis < multiAxisThreshold ? 'Good feet and shoulder alignment and distancing' : 
-  'Shoulder and feet alignment was too far apart. Bring feet in to a little less than shoulder width';
+  avgMultiAxis = avgMultiAxis / multiAxisResult.length;
+  console.log(
+    "Average alignment distance between feet and shoulders is: ",
+    avgMultiAxis
+  );
+  return avgMultiAxis < multiAxisThreshold
+    ? "Good feet and shoulder alignment and distancing"
+    : "Shoulder and feet alignment was too far apart. Bring feet in to a little less than shoulder width";
 };
 
 const getStringSingleAxis = (singleAxisResult: any) => {
@@ -84,10 +92,14 @@ const getStringSingleAxis = (singleAxisResult: any) => {
   for (const index in singleAxisResult) {
     avgSingleAxis += singleAxisResult[index].values;
   }
-  avgSingleAxis = avgSingleAxis/singleAxisResult.length;
-  console.log('Average axis alignment of shooting elbow, hip and knee is: ',avgSingleAxis);
-  return avgSingleAxis < singleAxisThreshold ? 'Good alignment down the shooting arm between elbow, hip and knee' : 
-  'Shooting side alignment was too spread. Bring the elbow and knee in line, facing toward the basket';
+  avgSingleAxis = avgSingleAxis / singleAxisResult.length;
+  console.log(
+    "Average axis alignment of shooting elbow, hip and knee is: ",
+    avgSingleAxis
+  );
+  return avgSingleAxis < singleAxisThreshold
+    ? "Good alignment down the shooting arm between elbow, hip and knee"
+    : "Shooting side alignment was too spread. Bring the elbow and knee in line, facing toward the basket";
 };
 
 const getStringCosine = (cosineResult: any) => {
@@ -96,15 +108,16 @@ const getStringCosine = (cosineResult: any) => {
   for (const index in cosineResult) {
     avgAngle += cosineResult[index];
   }
-  avgAngle = avgAngle/cosineResult.length;
-  console.log('Average Angle at elbow is: ',avgAngle);
-  return avgAngle > cosineThreshold ? 'Good extension that was held up for a good duration' : 
-  'Shooting arm was not fully extended and/or was not held toward basket for long enough. Fully extend arm towards the basket on follow through and hold it until ball reaches the basket';
+  avgAngle = avgAngle / cosineResult.length;
+  console.log("Average Angle at elbow is: ", avgAngle);
+  return avgAngle > cosineThreshold
+    ? "Good extension that was held up for a good duration"
+    : "Shooting arm was not fully extended and/or was not held toward basket for long enough. Fully extend arm towards the basket on follow through and hold it until ball reaches the basket";
 };
 
 /*Returns the total difference in right side axis alignment. An alternate calculation incorporating more
-* key points on the shooting side of the body.
-*/
+ * key points on the shooting side of the body.
+ */
 //DEH + DSH + DKH = minimum distance to axis D
 //Distance Elbow Hip + Distance Shoulder Hip + Distance Knee Hip
 // const getAllDifferencesSingle = (
@@ -164,7 +177,7 @@ const getAllDifferencesSingleAlt = (
     rightWristKeypoints
 */
 // old stuff
-export const callStuff = (keypoints: any) => {
+export const callStuff = (keypoints: any): IFeedback => {
   let eIndex = getEIndex(keypoints.midHipKeypoints);
   let fIndex = getFIndex(keypoints.rightWristKeypoints, eIndex);
 
@@ -219,7 +232,7 @@ export const callStuff = (keypoints: any) => {
   return {
     multiAxis: getStringMultiAxis(multiAxisResult),
     singleAxis: getStringSingleAxis(singleAxisResult),
-    angle: getStringCosine(cosResult)
+    angle: getStringCosine(cosResult),
   };
 };
 
@@ -283,14 +296,10 @@ export const getVectors = (
 
   const values = [];
   const isGreaterThanMax = fIndex + 20 < leftKeypoints.length - 1;
-  const loopTo = isGreaterThanMax ? fIndex + 20 : leftKeypoints.length-1;
+  const loopTo = isGreaterThanMax ? fIndex + 20 : leftKeypoints.length - 1;
   // console.log('isGreaterThanMax is', isGreaterThanMax);
   // console.log('loopToo', loopTo);
-  for (
-    let i = fIndex;
-    i < loopTo;
-    i++
-  ) {
+  for (let i = fIndex; i < loopTo; i++) {
     const u = leftKeypoints[i].y - rightKeypoints[i].y;
     const v = leftKeypoints[i].x - rightKeypoints[i].x; // This should be Z axis...
     values.push({ u, v });
@@ -365,9 +374,14 @@ export const getCosine = (
   }
   const results = [];
   for (const index in dotProductResultsArr) {
-    results.push(Math.acos(
-      dotProductResultsArr[index] /
-        (vectorRootsArr.ELWLResults[index] * vectorRootsArr.ElSLResults[index]))*180/Math.PI
+    results.push(
+      (Math.acos(
+        dotProductResultsArr[index] /
+          (vectorRootsArr.ELWLResults[index] *
+            vectorRootsArr.ElSLResults[index])
+      ) *
+        180) /
+        Math.PI
     );
   }
   return results;

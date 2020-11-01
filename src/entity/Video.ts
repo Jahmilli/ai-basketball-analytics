@@ -1,3 +1,4 @@
+import { IFeedback } from "../algorithms/algorithms";
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("videos")
@@ -26,8 +27,8 @@ export class Video {
   @Column("text")
   storage_uri!: string;
 
-  @Column("text")
-  feedback!: string;
+  @Column("jsonb", { nullable: true })
+  feedback!: IFeedback | null;
 
   @Column("timestamptz")
   uploaded_timestamp!: Date;

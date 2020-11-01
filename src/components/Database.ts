@@ -2,6 +2,7 @@ import { createConnection, getConnection } from "typeorm";
 import { Video } from "../entity/Video";
 import { getLogger } from "../utils/Logging";
 import * as util from "util";
+import { IFeedback } from "../algorithms/algorithms";
 
 export default class Database {
   private logger = getLogger();
@@ -31,7 +32,7 @@ export default class Database {
     return result;
   }
 
-  async updateVideoResult(id: string, feedback: string): Promise<Video> {
+  async updateVideoResult(id: string, feedback: IFeedback): Promise<Video> {
     const connectionManager = getConnection(this.connectionName).manager;
     const video = await connectionManager.findOne(Video, id);
     if (!video) {
