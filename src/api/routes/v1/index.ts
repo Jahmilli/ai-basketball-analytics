@@ -5,18 +5,23 @@ import { AnalyticsService } from "../../../services/AnalyticsService";
 import { formatError, getLogger } from "../../../utils/Logging";
 import { validationMiddleware } from "../../middlewares/validation";
 import { InSchema } from "../../schemas/InSchema";
+import Database from "../../../components/Database";
 
 export class V1Router implements IRouter {
   private readonly logger = getLogger();
   private readonly router: Router;
   private readonly prefix = "/v1";
 
-  constructor(private readonly analyticsService: AnalyticsService) {
+  constructor(
+    private readonly analyticsService: AnalyticsService,
+    readonly database: Database
+  ) {
     this.router = this.setupRoutes();
   }
 
   setupRoutes(): Router {
-    return Router().post(
+    const router = Router();
+    router.post(
       "/convert",
       // validationMiddleware(InSchema, "body"),
       async (req: Request, res: Response) => {
@@ -33,6 +38,10 @@ export class V1Router implements IRouter {
         }
       }
     );
+    router.get("/getScores", async () => {
+      return await this.database.getAllPlayerScores();
+    });
+    return router;
   }
 
   getPrefix(): string {

@@ -1,3 +1,5 @@
+import { getScoreAvg } from "./scores";
+
 interface IKeypoint {
   x: number;
   y: number;
@@ -11,19 +13,30 @@ interface IResults {
   ElSLResults: number[];
 }
 
+export interface IResult {
+  feedback: IFeedback;
+  scores: IScores;
+}
+
 export interface IFeedback {
   multiAxis: string;
   singleAxis: string;
   angle: string;
 }
 
+export interface IScores {
+  multiAxisScore: number;
+  singleAxisScore: number;
+  cosScore: number;
+}
+
 // Bens stuff
 /* Multi axis threshold is the set threshold for the alignment of feet and shoulders. A value greater than this
  ** means feet and shoulder alignment is too far apart and needs to be corrected -- closer to 0 the better.
  */
-const multiAxisThreshold = 20;
-const singleAxisThreshold = 25;
-const cosineThreshold = 165;
+export const multiAxisThreshold = 20;
+export const singleAxisThreshold = 25;
+export const cosineThreshold = 165;
 
 //Find index of Max hip value
 const getEIndex = (midHipKeypoints: any) => {
@@ -64,7 +77,7 @@ const getAllDifferences = (
   //const index = bodyMapping.indexOf(bodyPart) * 3;
   return Object.values(values).map((values, i) => {
     return {
-      values: values,
+      values,
     };
     // return fileValues.people[0].pose_keypoints_2d.slice(index, index + 3);
   });
@@ -156,7 +169,7 @@ const getAllDifferencesSingleAlt = (
   //const index = bodyMapping.indexOf(bodyPart) * 3;
   return Object.values(values).map((values, i) => {
     return {
-      values: values,
+      values,
     };
     // return fileValues.people[0].pose_keypoints_2d.slice(index, index + 3);
   });
@@ -177,9 +190,9 @@ const getAllDifferencesSingleAlt = (
     rightWristKeypoints
 */
 // old stuff
-export const callStuff = (keypoints: any): IFeedback => {
-  let eIndex = getEIndex(keypoints.midHipKeypoints);
-  let fIndex = getFIndex(keypoints.rightWristKeypoints, eIndex);
+export const callStuff = (keypoints: any): IResult => {
+  const eIndex = getEIndex(keypoints.midHipKeypoints);
+  const fIndex = getFIndex(keypoints.rightWristKeypoints, eIndex);
 
   const shoulderResult = getMultiAxisAlignment(
     keypoints.leftShoulderKeypoints,
@@ -230,9 +243,16 @@ export const callStuff = (keypoints: any): IFeedback => {
   // console.log('single axis string', getStringSingleAxis(singleAxisResult));
   // console.log('cosine string', getStringCosine(cosResult));
   return {
-    multiAxis: getStringMultiAxis(multiAxisResult),
-    singleAxis: getStringSingleAxis(singleAxisResult),
-    angle: getStringCosine(cosResult),
+    feedback: {
+      multiAxis: getStringMultiAxis(multiAxisResult),
+      singleAxis: getStringSingleAxis(singleAxisResult),
+      angle: getStringCosine(cosResult),
+    },
+    scores: {
+      multiAxisScore: getScoreAvg(multiAxisResult),
+      singleAxisScore: getScoreAvg(singleAxisResult),
+      cosScore: getScoreAvg(cosResult),
+    },
   };
 };
 
