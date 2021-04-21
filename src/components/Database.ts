@@ -66,4 +66,11 @@ export default class Database {
 
     return allPlayerScores;
   }
+
+  async getLastScore(): Promise<any> {
+    const connectionManager = getConnection(this.connectionName).manager;
+    const previousScores = await connectionManager.findOne(Scores);
+
+    return previousScores;
+  }
 }

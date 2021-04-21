@@ -16,4 +16,7 @@ export class Scores {
 
   @Column("text")
   score_follow!: string;
+
+  @Column("date")
+  date! : string;
 }

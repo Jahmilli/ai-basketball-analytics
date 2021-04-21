@@ -41,6 +41,11 @@ export class V1Router implements IRouter {
     router.get("/getScores", async () => {
       return await this.database.getAllPlayerScores();
     });
+
+    router.get("/getLastScore", async () => {
+      return await this.database.getLastScore();
+    });
+    
     return router;
   }
 
