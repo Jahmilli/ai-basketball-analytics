@@ -1,6 +1,6 @@
 import { createConnection, getConnection } from "typeorm";
 import { Video } from "../entity/Video";
-import { Scores } from "../entity/Scores";
+import { results } from "../entity/Results";
 import { getLogger } from "../utils/Logging";
 import * as util from "util";
 import { IFeedback } from "../algorithms/algorithms";
@@ -62,7 +62,8 @@ export default class Database {
 
   async getAllPlayerScores(): Promise<any> {
     const connectionManager = getConnection(this.connectionName).manager;
-    const allPlayerScores = await connectionManager.find(Scores);
+
+    const allPlayerScores = await connectionManager.find(results);
 
     return allPlayerScores;
   }
