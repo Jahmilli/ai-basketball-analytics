@@ -49,6 +49,11 @@ export class V1Router implements IRouter {
         res.sendStatus(500);
       }
     });
+
+    router.get("/getLastScore", async () => {
+      return await this.database.getLastScore();
+    });
+    
     return router;
   }
 
