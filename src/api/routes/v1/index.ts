@@ -50,9 +50,10 @@ export class V1Router implements IRouter {
       }
     });
 
-    router.get("/getLastScore", async (req: Request, res: Response) => {
+    router.get("/getLastScore/:userId", async (req: Request, res: Response) => {
+      this.logger.debug(`Received request with body ${inspect(req.body)}`);
       try {
-        const lastScore = await this.database.getLastScore();
+        const lastScore = await this.database.getLastScore(req.params.userId);
         res.status(200).json(lastScore);
       } catch (err) {
         this.logger.warn(

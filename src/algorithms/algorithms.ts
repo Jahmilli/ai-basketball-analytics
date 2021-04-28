@@ -1,4 +1,5 @@
 import { getScoreAvg } from "./scores";
+import { getFeedbackSingleAxis, getFeedbackMultiAxis, getFeedbackCosine } from "./feedback";
 
 interface IKeypoint {
   x: number;
@@ -83,51 +84,6 @@ const getAllDifferences = (
   });
 };
 
-const getStringMultiAxis = (multiAxisResult: any) => {
-  let avgMultiAxis = 0;
-  // console.log('rightWristKeypoints', rightWristKeypoints);
-  for (const index in multiAxisResult) {
-    avgMultiAxis += multiAxisResult[index].values;
-  }
-  avgMultiAxis = avgMultiAxis / multiAxisResult.length;
-  console.log(
-    "Average alignment distance between feet and shoulders is: ",
-    avgMultiAxis
-  );
-  return avgMultiAxis < multiAxisThreshold
-    ? "Good feet and shoulder alignment and distancing"
-    : "Shoulder and feet alignment was too far apart. Bring feet in to a little less than shoulder width";
-};
-
-const getStringSingleAxis = (singleAxisResult: any) => {
-  let avgSingleAxis = 0;
-  // console.log('rightWristKeypoints', rightWristKeypoints);
-  for (const index in singleAxisResult) {
-    avgSingleAxis += singleAxisResult[index].values;
-  }
-  avgSingleAxis = avgSingleAxis / singleAxisResult.length;
-  console.log(
-    "Average axis alignment of shooting elbow, hip and knee is: ",
-    avgSingleAxis
-  );
-  return avgSingleAxis < singleAxisThreshold
-    ? "Good alignment down the shooting arm between elbow, hip and knee"
-    : "Shooting side alignment was too spread. Bring the elbow and knee in line, facing toward the basket";
-};
-
-const getStringCosine = (cosineResult: any) => {
-  let avgAngle = 0;
-  // console.log('rightWristKeypoints', rightWristKeypoints);
-  for (const index in cosineResult) {
-    avgAngle += cosineResult[index];
-  }
-  avgAngle = avgAngle / cosineResult.length;
-  console.log("Average Angle at elbow is: ", avgAngle);
-  return avgAngle > cosineThreshold
-    ? "Good extension that was held up for a good duration"
-    : "Shooting arm was not fully extended and/or was not held toward basket for long enough. Fully extend arm towards the basket on follow through and hold it until ball reaches the basket";
-};
-
 /*Returns the total difference in right side axis alignment. An alternate calculation incorporating more
  * key points on the shooting side of the body.
  */
@@ -189,8 +145,8 @@ const getAllDifferencesSingleAlt = (
     rightKneeKeypoints,
     rightWristKeypoints
 */
-// old stuff
-export const callStuff = (keypoints: any): IResult => {
+
+export const analyseKeypoints = (keypoints: any): IResult => {
   const eIndex = getEIndex(keypoints.midHipKeypoints);
   const fIndex = getFIndex(keypoints.rightWristKeypoints, eIndex);
 
@@ -239,14 +195,14 @@ export const callStuff = (keypoints: any): IResult => {
   const roots = getVectorRoots(vector1, vector2); // (9, 10)
   const cosResult = getCosine(dotProductResult, roots); // (11)
   console.table(cosResult);
-  // console.log('multi axis string', getStringMultiAxis(multiAxisResult));
-  // console.log('single axis string', getStringSingleAxis(singleAxisResult));
-  // console.log('cosine string', getStringCosine(cosResult));
+  // console.log('multi axis string', getFeedbackMultiAxis(multiAxisResult));
+  // console.log('single axis string', getFeedbackSingleAxis(singleAxisResult));
+  // console.log('cosine string', getFeedbackCosine(cosResult));
   return {
     feedback: {
-      multiAxis: getStringMultiAxis(multiAxisResult),
-      singleAxis: getStringSingleAxis(singleAxisResult),
-      angle: getStringCosine(cosResult),
+      multiAxis: getFeedbackMultiAxis(multiAxisResult),
+      singleAxis: getFeedbackSingleAxis(singleAxisResult),
+      angle: getFeedbackCosine(cosResult),
     },
     scores: {
       multiAxisScore: getScoreAvg(multiAxisResult),

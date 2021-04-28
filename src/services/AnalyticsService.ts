@@ -1,6 +1,6 @@
 import { getLogger } from "../utils/Logging";
 import { inspect } from "util";
-import { callStuff } from "../algorithms/algorithms";
+import { analyseKeypoints } from "../algorithms/algorithms";
 import Database from "../components/Database";
 import { IConvertBody } from "../interfaces/IApiV1";
 import { calculateScore } from "../algorithms/scores";
@@ -22,7 +22,7 @@ export class AnalyticsService {
   }
 
   async analyseKeypoints(inObj: IConvertBody) {
-    const result = callStuff(inObj.keypoints);
+    const result = analyseKeypoints(inObj.keypoints);
     await this.database.updateVideoResult(inObj.id, result.feedback);
     const playerScores = calculateScore(result.scores);
     await this.database.writePlayerScores(inObj.id, playerScores);

@@ -4,6 +4,7 @@ import { results } from "../entity/Results";
 import { getLogger } from "../utils/Logging";
 import * as util from "util";
 import { IFeedback } from "../algorithms/algorithms";
+import { ConsoleTransportOptions } from "winston/lib/winston/transports";
 
 export default class Database {
   private logger = getLogger();
@@ -62,16 +63,16 @@ export default class Database {
 
   async getAllPlayerScores(): Promise<any> {
     const connectionManager = getConnection(this.connectionName).manager;
-
     const allPlayerScores = await connectionManager.find(results);
 
     return allPlayerScores;
   }
 
-  async getLastScore(): Promise<any> {
+  async getLastScore(userId: string): Promise<any> {
     const connectionManager = getConnection(this.connectionName).manager;
-    const previousScores = await connectionManager.findOne(results);
+    const lastScore = await connectionManager.createQueryBuilder(results, "results").where("results.user_id = :user_id", { user_id: userId })
+    .orderBy("results.created_timestamp", "DESC").getOne();
 
-    return previousScores;
+    return lastScore;
   }
 }
