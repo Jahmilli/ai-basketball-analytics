@@ -28,7 +28,6 @@ export interface IScores {
   multiAxisScore: number;
   singleAxisScore: number;
   cosScore: number;
-  date: string;
 }
 
 // Bens stuff
@@ -240,7 +239,6 @@ export const callStuff = (keypoints: any): IResult => {
   const roots = getVectorRoots(vector1, vector2); // (9, 10)
   const cosResult = getCosine(dotProductResult, roots); // (11)
   console.table(cosResult);
-  let date = Date.now;
   // console.log('multi axis string', getStringMultiAxis(multiAxisResult));
   // console.log('single axis string', getStringSingleAxis(singleAxisResult));
   // console.log('cosine string', getStringCosine(cosResult));
@@ -253,8 +251,7 @@ export const callStuff = (keypoints: any): IResult => {
     scores: {
       multiAxisScore: getScoreAvg(multiAxisResult),
       singleAxisScore: getScoreAvg(singleAxisResult),
-      cosScore: getScoreAvg(cosResult),
-      date: Date(),
+      cosScore: getScoreAvg(cosResult)
     },
   };
 };

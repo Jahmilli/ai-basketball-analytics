@@ -44,14 +44,23 @@ export class V1Router implements IRouter {
         res.status(200).json(results);
       } catch (err) {
         this.logger.warn(
-          `An error occurred when trying to convert name ${formatError(err)}`
+          `An error occurred when trying to get scores ${formatError(err)}`
         );
         res.sendStatus(500);
       }
     });
 
-    router.get("/getLastScore", async () => {
-      return await this.database.getLastScore();
+    router.get("/getLastScore", async (req: Request, res: Response) => {
+      try {
+        const lastScore = await this.database.getLastScore();
+        res.status(200).json(lastScore);
+      } catch (err) {
+        this.logger.warn(
+          `An error occurred when trying to get previous score ${formatError(err)}`
+        );
+        res.sendStatus(500);
+      }
+      
     });
     
     return router;

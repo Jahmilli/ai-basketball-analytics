@@ -96,13 +96,13 @@ const setupFilesMap = async () => {
   getSingleAxisAlignment(leftShoulderKeypoints, leftHipKeypoints); // (4)
   getSingleAxisAlignment(leftKneeKeypoints, leftHipKeypoints); // (5)
 
-  const vector1 = getVectors(leftWristKeypoints, leftElbowKeypoints); // (6)
-  const vector2 = getVectors(leftShoulderKeypoints, leftElbowKeypoints); // (7)
+  // const vector1 = getVectors(leftWristKeypoints, leftElbowKeypoints); // (6)
+  // const vector2 = getVectors(leftShoulderKeypoints, leftElbowKeypoints); // (7)
 
-  const dotProductResult = getDotProduct(vector1, vector2); // (8)
-  const roots = getVectorRoots(vector1, vector2); // (9, 10)
-  const cosResult = getCosine(dotProductResult, roots); // (11)
-  console.table(cosResult);
+  // const dotProductResult = getDotProduct(vector1, vector2); // (8)
+  // const roots = getVectorRoots(vector1, vector2); // (9, 10)
+  // const cosResult = getCosine(dotProductResult, roots); // (11)
+  // console.table(cosResult);
 
   return "done";
 };

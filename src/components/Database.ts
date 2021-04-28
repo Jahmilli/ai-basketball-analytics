@@ -70,7 +70,7 @@ export default class Database {
 
   async getLastScore(): Promise<any> {
     const connectionManager = getConnection(this.connectionName).manager;
-    const previousScores = await connectionManager.findOne(Scores);
+    const previousScores = await connectionManager.findOne(results);
 
     return previousScores;
   }
