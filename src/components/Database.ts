@@ -77,7 +77,7 @@ export default class Database {
       }
     }
 
-    return allPlayerScores;
+    return payload;
   }
 
   async getLastScore(userId: string): Promise<any> {
