@@ -1,5 +1,7 @@
 import { createConnection, getConnection } from "typeorm";
 import { Video } from "../entity/Video";
+import { Result } from "../entity/Results";
+import { User } from "../entity/Users";
 import { getLogger } from "../utils/Logging";
 import * as util from "util";
 import { IFeedback } from "../algorithms/algorithms";
@@ -50,5 +52,42 @@ export default class Database {
     const connectionManager = getConnection(this.connectionName).manager;
     const result = await connectionManager.find(Video, { user_id: userId });
     return result;
+  }
+
+  async writePlayerScores(id: string, scores: any): Promise<any> {
+    const result = await getConnection(this.connectionName).manager.save(
+      scores
+    );
+    return result;
+  }
+
+  async getAllPlayerScores(): Promise<any> {
+    const connectionManager = getConnection(this.connectionName).manager;
+    const allPlayerScores = await connectionManager.find(Result);
+    const allUsers = await connectionManager.find(User);
+
+    const payload = [];
+
+    for (const user of allUsers) {
+      for (const result of allPlayerScores) {
+        if (result.user_id === user.id) {
+          result.user_email = user.email;
+          payload.push(result);
+        }
+      }
+    }
+
+    return allPlayerScores;
+  }
+
+  async getLastScore(userId: string): Promise<any> {
+    const connectionManager = getConnection(this.connectionName).manager;
+    const lastScore = await connectionManager
+      .createQueryBuilder(Result, "results")
+      .where("results.user_id = :user_id", { user_id: userId })
+      .orderBy("results.created_timestamp", "DESC")
+      .getOne();
+
+    return lastScore;
   }
 }
