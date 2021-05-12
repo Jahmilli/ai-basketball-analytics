@@ -1,10 +1,10 @@
 import { createConnection, getConnection } from "typeorm";
 import { Video } from "../entity/Video";
-import { results } from "../entity/Results";
+import { Result } from "../entity/Results";
+import { User } from "../entity/Users";
 import { getLogger } from "../utils/Logging";
 import * as util from "util";
 import { IFeedback } from "../algorithms/algorithms";
-import { ConsoleTransportOptions } from "winston/lib/winston/transports";
 
 export default class Database {
   private logger = getLogger();
@@ -63,15 +63,30 @@ export default class Database {
 
   async getAllPlayerScores(): Promise<any> {
     const connectionManager = getConnection(this.connectionName).manager;
-    const allPlayerScores = await connectionManager.find(results);
+    const allPlayerScores = await connectionManager.find(Result);
+    const allUsers = await connectionManager.find(User);
 
-    return allPlayerScores;
+    const payload = [];
+
+    for (const user of allUsers) {
+      for (const result of allPlayerScores) {
+        if (result.user_id === user.id) {
+          result.user_email = user.email;
+          payload.push(result);
+        }
+      }
+    }
+
+    return payload;
   }
 
   async getLastScore(userId: string): Promise<any> {
     const connectionManager = getConnection(this.connectionName).manager;
-    const lastScore = await connectionManager.createQueryBuilder(results, "results").where("results.user_id = :user_id", { user_id: userId })
-    .orderBy("results.created_timestamp", "DESC").getOne();
+    const lastScore = await connectionManager
+      .createQueryBuilder(Result, "results")
+      .where("results.user_id = :user_id", { user_id: userId })
+      .orderBy("results.created_timestamp", "DESC")
+      .getOne();
 
     return lastScore;
   }

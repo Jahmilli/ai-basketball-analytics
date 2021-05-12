@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("results")
-export class results {
+export class Result {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
@@ -19,4 +19,6 @@ export class results {
 
   @Column("date")
   created_timestamp! : Date;
+
+  user_email!: string;
 }
