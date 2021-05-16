@@ -17,6 +17,13 @@ An interface is also setup in `src/interfaces/IConfig.ts` where any configuratio
 |-----------|------------|---------------------------------------|-------------------|------------|
 |/v1/convert|POST        |{ "name": string, "timestamp": number }|\<Add Headers here>|Prepends the 'name' field with "Prof ." and returns it to the client as well as writes it to Kafka
 
+### Environment Variables
+
+The following environment variables are required to run the application:
+
+- `POSTGRESQL_USER`
+- `POSTGRESQL_PASSWORD`
+- `POSTGRESQL_DATABASE`
 
 ## Development
 
@@ -41,7 +48,7 @@ npm run start:dev
 
 To build: `npm run build`
 
-To run: `npm start`
+To run: `LOG_LEVEL=debug POSTGRESQL_USER=postgres POSTGRESQL_PASSWORD=password POSTGRESQL_DATABASE=mydb npm run start`
 
 Test Docker build locally:
 
@@ -55,6 +62,19 @@ docker build -t ai-basketball-analytics .
 ```bash
 npm start
 ```
+
+## Sync
+
+To update the application in S3, assuming you've got the right credentials, run the following:
+
+```
+npm ci && npm run build
+mkdir ai-basketball-analytics
+cp -r dist ai-basketball-analytics/ && cp -r config ai-basketball-analytics/ && cp -r node_modules ai-basketball-analytics/
+zip -r ai-basketball-analytics.zip ai-basketball-analytics/
+aws s3 cp ./ai-basketball-analytics.zip s3://ai-basketball-applications/
+```
+
 
 ## Conventions
 ### Directory structure
