@@ -23,9 +23,10 @@ export class AnalyticsService {
 
   async analyseKeypoints(inObj: IConvertBody) {
     const result = analyseKeypoints(inObj.keypoints);
-    await this.database.updateVideoResult(inObj.id, result.feedback);
-    const playerScores = calculateScore(result.scores);
+    const video = await this.database.updateVideoResult(inObj.id, result.feedback);
+    console.log(video);
+    const playerScores = calculateScore(result.scores, video.user_id);
     console.log("player scores are ", playerScores);
-    await this.database.writePlayerScores(inObj.id, playerScores);
+    await this.database.writePlayerScores(playerScores);
   }
 }

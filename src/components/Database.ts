@@ -4,7 +4,7 @@ import { Result } from "../entity/Results";
 import { User } from "../entity/Users";
 import { getLogger } from "../utils/Logging";
 import * as util from "util";
-import { IFeedback } from "../algorithms/algorithms";
+import { IFeedback, IScores } from "../algorithms/algorithms";
 import config from "config";
 import { IDatabaseConfig } from "../interfaces/IConfig";
 
@@ -64,10 +64,9 @@ export default class Database {
     return result;
   }
 
-  async writePlayerScores(id: string, scores: any): Promise<any> {
-    const result = await getConnection(this.connectionName).manager.save(
-      scores
-    );
+  async writePlayerScores(scores :Result): Promise<Result> {
+    const result = await getConnection(this.connectionName).manager.save(scores    );
+
     return result;
   }
 
