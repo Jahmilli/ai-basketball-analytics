@@ -8,5 +8,5 @@ module.exports = {
     // Also only accessible from within the VPC from a specific SG so it's safe...
     host: "ai-basketball.cwlop5aflogk.ap-southeast-2.rds.amazonaws.com",
     port: 5432,
-  }
+  },
 };

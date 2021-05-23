@@ -1,5 +1,9 @@
 import { getScoreAvg } from "./scores";
-import { getFeedbackSingleAxis, getFeedbackMultiAxis, getFeedbackCosine } from "./feedback";
+import {
+  getFeedbackSingleAxis,
+  getFeedbackMultiAxis,
+  getFeedbackCosine,
+} from "./feedback";
 
 interface IKeypoint {
   x: number;
@@ -207,7 +211,7 @@ export const analyseKeypoints = (keypoints: any): IResult => {
     scores: {
       multiAxisScore: getScoreAvg(multiAxisResult),
       singleAxisScore: getScoreAvg(singleAxisResult),
-      cosScore: getScoreAvg(cosResult)
+      cosScore: getScoreAvg(cosResult),
     },
   };
 };

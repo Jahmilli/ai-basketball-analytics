@@ -31,5 +31,5 @@ export class Video {
   feedback!: IFeedback | null;
 
   @Column("timestamptz")
-  uploaded_timestamp!: Date;
+  created_timestamp!: Date;
 }

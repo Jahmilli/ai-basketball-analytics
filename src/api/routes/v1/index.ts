@@ -40,8 +40,10 @@ export class V1Router implements IRouter {
     );
     router.get("/getScores", async (req: Request, res: Response) => {
       try {
-        const results = await this.database.getAllPlayerScores();
-        res.status(200).json(results);
+        // const results = await this.database.getAllPlayerScores();
+        res.status(200).json({
+          results: "hi",
+        });
       } catch (err) {
         this.logger.warn(
           `An error occurred when trying to get scores ${formatError(err)}`
@@ -57,13 +59,14 @@ export class V1Router implements IRouter {
         res.status(200).json(lastScore);
       } catch (err) {
         this.logger.warn(
-          `An error occurred when trying to get previous score ${formatError(err)}`
+          `An error occurred when trying to get previous score ${formatError(
+            err
+          )}`
         );
         res.sendStatus(500);
       }
-      
     });
-    
+
     return router;
   }
 

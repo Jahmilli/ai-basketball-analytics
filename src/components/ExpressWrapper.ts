@@ -20,8 +20,8 @@ export class ExpressWrapper {
     // Add any non route specific Express middleware here
     const app = express()
       .use(cors())
-      .use(express.urlencoded({ extended: true }))
-      .use(bodyParser.json());
+      .use(express.json({ limit: "100mb" }))
+      .use(express.urlencoded({ limit: "100mb", extended: true }));
 
     this.logger.info("Setup Express");
     return app;

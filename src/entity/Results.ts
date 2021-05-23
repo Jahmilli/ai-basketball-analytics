@@ -18,7 +18,7 @@ export class Result {
   score_follow!: string;
 
   @Column("date")
-  created_timestamp! : Date;
+  created_timestamp!: Date;
 
   user_email!: string;
 }

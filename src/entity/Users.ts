@@ -15,7 +15,7 @@ export class User {
   last_name!: string;
 
   @Column("date")
-  date_of_birth!: string;
+  date_of_birth!: Date;
 
   @Column("date")
   last_updated!: Date;

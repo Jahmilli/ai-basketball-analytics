@@ -25,6 +25,7 @@ export class AnalyticsService {
     const result = analyseKeypoints(inObj.keypoints);
     await this.database.updateVideoResult(inObj.id, result.feedback);
     const playerScores = calculateScore(result.scores);
-    await this.database.writePlayerScores(inObj.id, playerScores);
+    console.log("player scores are ", playerScores);
+    // await this.database.writePlayerScores(inObj.id, playerScores);
   }
 }
