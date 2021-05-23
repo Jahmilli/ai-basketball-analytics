@@ -16,7 +16,7 @@ export default class Database {
     const databaseConfig: IDatabaseConfig = config.get("database");
     await createConnection({
       name: this.connectionName,
-      entities: [User, Video],
+      entities: [User, Video, Result],
       ...databaseConfig,
       username: process.env.POSTGRESQL_USER,
       password: process.env.POSTGRESQL_PASSWORD,
@@ -64,10 +64,15 @@ export default class Database {
     return result;
   }
 
-  async writePlayerScores(scores :Result): Promise<Result> {
-    const result = await getConnection(this.connectionName).manager.save(scores    );
-
-    return result;
+  async writePlayerScores(scores: Result): Promise<Result | undefined> {
+    try {
+      const result = await getConnection(this.connectionName).manager.save(
+        scores
+      );
+      return result;
+    } catch (err) {
+      console.warn(`An error occurred when writing player scores`, err);
+    }
   }
 
   async getAllPlayerScores(): Promise<any> {
@@ -82,7 +87,8 @@ export default class Database {
         if (result.user_id === user.id) {
           payload.push({
             ...result,
-            user_email: user.email
+            first_name: user.first_name,
+            last_name: user.last_name,
           });
         }
       }
