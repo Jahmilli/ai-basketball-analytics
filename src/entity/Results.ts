@@ -18,11 +18,7 @@ export class Result {
   score_follow!: string;
 
   @Column("date")
-<<<<<<< HEAD
-  created_timestamp! : Date;
-=======
   created_timestamp!: Date;
->>>>>>> leaderboard
 
   user_email!: string;
 }

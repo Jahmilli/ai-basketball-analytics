@@ -100,8 +100,4 @@ export default class Database {
 
     return lastScore;
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> leaderboard

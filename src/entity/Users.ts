@@ -14,7 +14,7 @@ export class User {
   @Column("text")
   last_name!: string;
 
-  @Column("date")
+@Column("date")
   date_of_birth!: string;
 
   @Column("date")
@@ -22,8 +22,4 @@ export class User {
 
   @Column("date")
   created_timestamp!: Date;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> leaderboard
