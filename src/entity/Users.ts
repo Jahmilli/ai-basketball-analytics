@@ -22,4 +22,8 @@ export class User {
 
   @Column("date")
   created_timestamp!: Date;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> leaderboard
