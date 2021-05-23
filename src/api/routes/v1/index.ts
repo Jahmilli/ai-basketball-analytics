@@ -40,10 +40,8 @@ export class V1Router implements IRouter {
     );
     router.get("/getScores", async (req: Request, res: Response) => {
       try {
-        // const results = await this.database.getAllPlayerScores();
-        res.status(200).json({
-          results: "hi",
-        });
+        const results = await this.database.getAllPlayerScores();
+        res.status(200).json(results);
       } catch (err) {
         this.logger.warn(
           `An error occurred when trying to get scores ${formatError(err)}`

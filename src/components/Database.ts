@@ -81,8 +81,10 @@ export default class Database {
     for (const user of allUsers) {
       for (const result of allPlayerScores) {
         if (result.user_id === user.id) {
-          result.user_email = user.email;
-          payload.push(result);
+          payload.push({
+            ...result,
+            user_email: user.email
+          });
         }
       }
     }

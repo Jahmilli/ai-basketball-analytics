@@ -19,6 +19,4 @@ export class Result {
 
   @Column("date")
   created_timestamp!: Date;
-
-  user_email!: string;
 }
