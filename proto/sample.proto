@@ -1,0 +1,12 @@
+syntax = "proto3";
+// See https://developers.google.com/protocol-buffers/docs/proto3
+
+message In {
+  string name = 1;
+  uint64 timestamp = 2;
+}
+
+message Out {
+  string full_name = 1;
+  uint64 timestamp = 2;
+}
